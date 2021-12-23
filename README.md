@@ -1,70 +1,302 @@
-# Getting Started with Create React App
+# Create-React-App创建React项目流程
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+### 1.快速开始
 
-## Available Scripts
+```shell
+npx create-react-app my-app
+cd my-app
+yarn start
+```
 
-In the project directory, you can run:
+### 2.安装UI库 ArcoDesign
 
-### `yarn start`
+```shell
+yarn add @arco-design/web-react
+```
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in your browser.
+#### 2.1 ArcoDesign基础使用
 
-The page will reload when you make changes.\
-You may also see any lint errors in the console.
+```react
+import React from "react";
+import ReactDOM from "react-dom";
+import { Button } from "@arco-design/web-react";
+import "@arco-design/web-react/dist/css/arco.css";
 
-### `yarn test`
+ReactDOM.render(
+  <Button type="primary">Hello Arco</Button>,
+  document.querySelector("#root")
+);
+```
 
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+#### 2.2 webpack 按需加载
 
-### `yarn build`
+##### 2.2.1安装依赖
 
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
+```shell
+npm install @craco/craco -D
+# or
+yarn add @craco/craco -D
 
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
+```
 
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
+```shell
+npm install babel-plugin-import -D
+# or
+yarn add babel-plugin-import -D
+```
 
-### `yarn eject`
+在项目根目录下创建`carco.config.js`
 
-**Note: this is a one-way operation. Once you `eject`, you can't go back!**
+```js
+// craco-config.js
+module.exports = {
+  babel: {
+    plugins: [
+      [
+        "import",
+        {
+          libraryName: "@arco-design/web-react",
+          libraryDirectory: "es",
+          camel2DashComponentName: false,
+          style: "css", // 样式按需加载
+        },
+      ],
+    ],
+  },
+};
 
-If you aren't satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
+```
 
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you're on your own.
+修改`package.json`启动命令
 
-You don't have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn't feel obligated to use this feature. However we understand that this tool wouldn't be useful if you couldn't customize it when you are ready for it.
+```json
+ "scripts": {
+    - "start": "react-scripts start",
+    + "start": "craco start",
+    - "build": "react-scripts build",
+    + "build": "craco build",
+    - "test": "react-scripts test",
+    + "test": "craco test",
+    "eject": "react-scripts eject"
+  },
+```
 
-## Learn More
+在终端重新运行项目即可
 
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
+```shell
+yarn start
+```
 
-To learn React, check out the [React documentation](https://reactjs.org/).
+### 3.使用sass
 
-### Code Splitting
+##### 3.1 安装依赖
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/code-splitting](https://facebook.github.io/create-react-app/docs/code-splitting)
+```shell
+yarn add node-sass -D
+# or 
+npm i node-sass -D
+```
 
-### Analyzing the Bundle Size
+##### 3.2 全局使用sass
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size](https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size)
+```shell
+yarn add craco-sass-resources-loader -D
+# or 
+npm i craco-sass-resources-loader -D
+```
 
-### Making a Progressive Web App
+##### 3.3 在`src`目录下创建`styles`文件，完整目录如下：
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app](https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app)
+```shell
+└── src
+    ├── styles # 样式文件
+    │   ├──  variable.scss # 变量样式文件
+    │   ├──  common.scss # 公共样式文件
+```
 
-### Advanced Configuration
+##### 3.4 配置`craco.config.js`
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/advanced-configuration](https://facebook.github.io/create-react-app/docs/advanced-configuration)
+```js
+const sassResourcesLoader = require("craco-sass-resources-loader");
 
-### Deployment
+module.exports = {
+  // craco 插件配置
+  plugins: [
+    {
+      plugin: sassResourcesLoader,
+      options: {
+        resources: ["./src/styles/variable.scss", "./src/styles/common.scss"],
+      },
+    },
+  ],
+}
+```
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/deployment](https://facebook.github.io/create-react-app/docs/deployment)
+##### 3.5 重新启动项目
 
-### `yarn build` fails to minify
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify](https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify)
+
+### 4.路由
+
+##### 4.1安装依赖
+
+```shell
+yarn add react-router-dom
+# or 
+npm i react-router-dom
+```
+
+##### 4.2创建文件
+
+在`src`目录下创建`views`,完整目录如下：
+
+```shell
+└── src
+    ├── views # 所有页面文件
+    │   └── index # 首页
+    │       ├── index.jsx
+    │   └── detail # 详情页
+    │       ├── index.jsx
+```
+
+##### 4.3 创建页面布局文件
+
+在`src`目录下创建`layout/index.jsx`
+
+```js
+// layout/index.jsx
+import React from "react";
+import { Outlet } from "react-router-dom";
+import { Layout } from "@arco-design/web-react";
+
+function PublicLayout() {
+  const { Header, Footer, Content } = Layout;
+  return (
+    <Layout>
+      <Header>Header</Header>
+      <Content>
+        <Outlet />
+      </Content>
+      <Footer>Footer</Footer>
+    </Layout>
+  );
+}
+
+export default React.memo(PublicLayout);
+
+```
+
+其中`<Outlet/>`类似于vue路由中的`<router-view></router-view>`
+
+##### 4.4 创建路由配置文件
+
+在`src`目录下创建`routers/index.js`路由文件
+
+```js
+// routers/index.js
+import React, { lazy } from "react";
+import { useRoutes } from "react-router-dom";
+
+import LayoutPage from "@/layout";
+
+const Home = lazy(() => import("@/views/index"));
+const TempDetail = lazy(() => import("@/views/detail"));
+
+const routeList = [
+  {
+    path: "/",
+    element: <LayoutPage />,
+    children: [
+      {
+        index: true,
+        element: <Home />,
+      },
+      {
+        path: "detail",
+        element: <TempDetail />,
+      },
+    ],
+  },
+];
+
+const RenderRouter = () => {
+  const element = useRoutes(routeList);
+  return element;
+};
+
+export default RenderRouter;
+
+```
+
+`@`需要提前配置，配置如下：
+
+```js
+// craco.config.js 
+const path = require("path");
+module.exports = {
+  // webpack配置
+  webpack: {
+    // 配置别名
+    alias: {
+      "@": path.resolve(__dirname, "src"),
+    },
+  },
+}
+```
+
+##### 4.5 修改`App.js`文件
+
+```js
+import React, { Suspense } from "react";
+import { BrowserRouter } from "react-router-dom";
+import RenderRouter from "./routers";
+import LoadingComponent from "@/compontents/Loading";
+
+export default function App() {
+  return (
+    <BrowserRouter>
+      <Suspense fallback={<LoadingComponent />}>
+        <RenderRouter />
+      </Suspense>
+    </BrowserRouter>
+  );
+}
+```
+
+`Suspense`需要`fallback` 需要注册一个全局的加载组件
+
+##### 4.6 创建`compontents/Loading/index.jsx`
+
+在创建文件前，先安装`nprogress`加载组件
+
+```shell
+npm i nprogress
+# or 
+yarn add nprogress
+```
+
+组件代码如下：
+
+```jsx
+import React, { Component } from "react";
+
+import NProgress from "nprogress";
+import "nprogress/nprogress.css";
+
+export default class LoadingComponent extends Component {
+  constructor(props) {
+    super(props);
+    NProgress.start();
+  }
+
+  componentDidMount() {
+    NProgress.done();
+  }
+
+  render() {
+    return <div />;
+  }
+}
+```
+
+
